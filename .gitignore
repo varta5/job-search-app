@@ -1,12 +1,3 @@
-# Compiled class file
-*.class
-
-# General and Log file
-*.log
-*.bak
-*.tmp
-logs
-
 HELP.md
 .gradle
 build/
@@ -44,6 +35,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-# Environment variables in Dotenv file
-.env
