@@ -7,13 +7,27 @@ import javax.persistence.Id;
 public class AppClient {
 
     @Id
-    private Long id;
-
     private String apiKey;
     private String name;
     private String emailAddress;
 
     public AppClient() {
     }
+
+    // region SETTERS
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    // endregion
 
 }
