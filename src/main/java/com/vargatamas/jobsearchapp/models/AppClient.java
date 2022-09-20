@@ -11,7 +11,7 @@ public class AppClient {
 
     private String apiKey;
     private String name;
-    private String eMailAddress;
+    private String emailAddress;
 
     public AppClient() {
     }
