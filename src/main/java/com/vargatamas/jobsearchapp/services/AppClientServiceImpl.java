@@ -30,7 +30,7 @@ public class AppClientServiceImpl implements AppClientService {
         // TODO avoid duplication of e-mail address
         throwExceptionIfFieldIsMissing("name", clientRegistrationRequestDTO.getName());
         throwExceptionIfFieldIsMissing("emailAddress", clientRegistrationRequestDTO.getEmailAddress());
-        throwExceptionIfFieldIsTooLong("name", clientRegistrationRequestDTO.getName(), 100);
+        throwExceptionIfNameIsTooLong(clientRegistrationRequestDTO.getName());
         throwExceptionIfNotValidEmailAddress(clientRegistrationRequestDTO.getEmailAddress());
         AppClient appClient = modelMapper.map(clientRegistrationRequestDTO, AppClient.class);
         String apiKeyGeneratedRandomly;
@@ -48,9 +48,9 @@ public class AppClientServiceImpl implements AppClientService {
         }
     }
 
-    private void throwExceptionIfFieldIsTooLong(String nameOfField, String valueOfField, int characterLimit) {
-        if (valueOfField.length() > characterLimit) {
-            throw new InvalidInputParameterException("Field '" + nameOfField + "' should not exceed " + characterLimit + " characters");
+    private void throwExceptionIfNameIsTooLong(String name) {
+        if (name.length() > 100) {
+            throw new InvalidInputParameterException("Field 'name' should not exceed 100 characters");
         }
     }
 
