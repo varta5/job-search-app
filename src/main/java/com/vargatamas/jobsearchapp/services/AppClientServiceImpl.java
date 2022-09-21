@@ -27,11 +27,11 @@ public class AppClientServiceImpl implements AppClientService {
 
     @Override
     public ClientRegistrationResponseDTO saveClient(ClientRegistrationRequestDTO clientRegistrationRequestDTO) {
-        // TODO avoid duplication of e-mail address
         throwExceptionIfFieldIsMissing("name", clientRegistrationRequestDTO.getName());
         throwExceptionIfFieldIsMissing("emailAddress", clientRegistrationRequestDTO.getEmailAddress());
         throwExceptionIfNameIsTooLong(clientRegistrationRequestDTO.getName());
         throwExceptionIfNotValidEmailAddress(clientRegistrationRequestDTO.getEmailAddress());
+        throwExceptionIfEmailAddressAlreadySaved(clientRegistrationRequestDTO.getEmailAddress());
         AppClient appClient = modelMapper.map(clientRegistrationRequestDTO, AppClient.class);
         String apiKeyGeneratedRandomly;
         do {
@@ -58,6 +58,12 @@ public class AppClientServiceImpl implements AppClientService {
         Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
         if (!emailPattern.matcher(emailAddress).matches()) {
             throw new InvalidInputParameterException("Please provide valid e-mail address in the 'emailAddress' field");
+        }
+    }
+
+    private void throwExceptionIfEmailAddressAlreadySaved(String emailAddress) {
+        if (appClientRepository.findByEmailAddress(emailAddress).isPresent()) {
+            throw new InvalidInputParameterException("E-mail address '" + emailAddress + "' is already in use");
         }
     }
 
