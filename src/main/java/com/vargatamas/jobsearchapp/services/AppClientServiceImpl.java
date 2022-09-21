@@ -22,23 +22,12 @@ public class AppClientServiceImpl implements AppClientService {
 
     @Override
     public ClientRegistrationResponseDTO saveClient(ClientRegistrationRequestDTO clientRegistrationRequestDTO) {
-        // TODO organize to private methods
         // TODO API key generation
         // TODO avoid duplication of e-mail address
-        if (clientRegistrationRequestDTO.getName() == null || clientRegistrationRequestDTO.getName().isEmpty()) {
-            throw new InvalidInputParameterException("Field 'name' is missing or empty");
-        }
-        if (clientRegistrationRequestDTO.getEmailAddress() == null
-                || clientRegistrationRequestDTO.getEmailAddress().isEmpty()) {
-            throw new InvalidInputParameterException("Field 'emailAddress' is missing or empty");
-        }
-        if (clientRegistrationRequestDTO.getName().length() > 100) {
-            throw new InvalidInputParameterException("Field 'name' should not exceed 100 characters");
-        }
-        Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
-        if (!emailPattern.matcher(clientRegistrationRequestDTO.getEmailAddress()).matches()) {
-            throw new InvalidInputParameterException("Please provide valid e-mail address in the 'emailAddress' field");
-        }
+        throwExceptionIfFieldIsMissing("name", clientRegistrationRequestDTO.getName());
+        throwExceptionIfFieldIsMissing("emailAddress", clientRegistrationRequestDTO.getEmailAddress());
+        throwExceptionIfFieldIsTooLong("name", clientRegistrationRequestDTO.getName(), 100);
+        throwExceptionIfNotValidEmailAddress(clientRegistrationRequestDTO.getEmailAddress());
         AppClient appClient = new AppClient();
         appClient.setName(clientRegistrationRequestDTO.getName());
         appClient.setEmailAddress(clientRegistrationRequestDTO.getEmailAddress());
@@ -46,6 +35,25 @@ public class AppClientServiceImpl implements AppClientService {
         appClient.setApiKey(randomKey);
         appClientRepository.save(appClient);
         return new ClientRegistrationResponseDTO(randomKey);
+    }
+
+    private void throwExceptionIfFieldIsMissing(String nameOfField, String valueOfField) {
+        if (valueOfField == null || valueOfField.isEmpty()) {
+            throw new InvalidInputParameterException("Field '" + nameOfField + "' is missing or empty");
+        }
+    }
+
+    private void throwExceptionIfFieldIsTooLong(String nameOfField, String valueOfField, int characterLimit) {
+        if (valueOfField.length() > characterLimit) {
+            throw new InvalidInputParameterException("Field '" + nameOfField + "' should not exceed " + characterLimit + " characters");
+        }
+    }
+
+    private void throwExceptionIfNotValidEmailAddress(String emailAddress) {
+        Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
+        if (!emailPattern.matcher(emailAddress).matches()) {
+            throw new InvalidInputParameterException("Please provide valid e-mail address in the 'emailAddress' field");
+        }
     }
 
 }
