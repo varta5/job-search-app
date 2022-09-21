@@ -27,6 +27,7 @@ public class AppClientServiceImpl implements AppClientService {
 
     @Override
     public ClientRegistrationResponseDTO saveClient(ClientRegistrationRequestDTO clientRegistrationRequestDTO) {
+        throwExceptionIfRequestBodyDtoIsMissing(clientRegistrationRequestDTO);
         throwExceptionIfFieldIsMissing("name", clientRegistrationRequestDTO.getName());
         throwExceptionIfFieldIsMissing("emailAddress", clientRegistrationRequestDTO.getEmailAddress());
         throwExceptionIfNameIsTooLong(clientRegistrationRequestDTO.getName());
@@ -40,6 +41,13 @@ public class AppClientServiceImpl implements AppClientService {
         appClient.setApiKey(apiKeyGeneratedRandomly);
         appClientRepository.save(appClient);
         return new ClientRegistrationResponseDTO(apiKeyGeneratedRandomly);
+    }
+
+    private void throwExceptionIfRequestBodyDtoIsMissing(ClientRegistrationRequestDTO clientRegistrationRequestDTO) {
+        if (clientRegistrationRequestDTO == null) {
+            throw new InvalidInputParameterException(
+                    "Please provide request body in JSON format containing fields 'name' and 'emailAddress'");
+        }
     }
 
     private void throwExceptionIfFieldIsMissing(String nameOfField, String valueOfField) {
