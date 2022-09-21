@@ -5,6 +5,7 @@ import com.vargatamas.jobsearchapp.dtos.ClientRegistrationResponseDTO;
 import com.vargatamas.jobsearchapp.exceptions.InvalidInputParameterException;
 import com.vargatamas.jobsearchapp.models.AppClient;
 import com.vargatamas.jobsearchapp.repositories.AppClientRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +16,12 @@ public class AppClientServiceImpl implements AppClientService {
 
     private final AppClientRepository appClientRepository;
 
+    private final ModelMapper modelMapper;
+
     @Autowired
-    public AppClientServiceImpl(AppClientRepository appClientRepository) {
+    public AppClientServiceImpl(AppClientRepository appClientRepository, ModelMapper modelMapper) {
         this.appClientRepository = appClientRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -28,9 +32,7 @@ public class AppClientServiceImpl implements AppClientService {
         throwExceptionIfFieldIsMissing("emailAddress", clientRegistrationRequestDTO.getEmailAddress());
         throwExceptionIfFieldIsTooLong("name", clientRegistrationRequestDTO.getName(), 100);
         throwExceptionIfNotValidEmailAddress(clientRegistrationRequestDTO.getEmailAddress());
-        AppClient appClient = new AppClient();
-        appClient.setName(clientRegistrationRequestDTO.getName());
-        appClient.setEmailAddress(clientRegistrationRequestDTO.getEmailAddress());
+        AppClient appClient = modelMapper.map(clientRegistrationRequestDTO, AppClient.class);
         String randomKey = "Random key " + (int) (Math.random() * 1000000);
         appClient.setApiKey(randomKey);
         appClientRepository.save(appClient);
