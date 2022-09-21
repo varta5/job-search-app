@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Service
@@ -26,17 +27,19 @@ public class AppClientServiceImpl implements AppClientService {
 
     @Override
     public ClientRegistrationResponseDTO saveClient(ClientRegistrationRequestDTO clientRegistrationRequestDTO) {
-        // TODO API key generation
         // TODO avoid duplication of e-mail address
         throwExceptionIfFieldIsMissing("name", clientRegistrationRequestDTO.getName());
         throwExceptionIfFieldIsMissing("emailAddress", clientRegistrationRequestDTO.getEmailAddress());
         throwExceptionIfFieldIsTooLong("name", clientRegistrationRequestDTO.getName(), 100);
         throwExceptionIfNotValidEmailAddress(clientRegistrationRequestDTO.getEmailAddress());
         AppClient appClient = modelMapper.map(clientRegistrationRequestDTO, AppClient.class);
-        String randomKey = "Random key " + (int) (Math.random() * 1000000);
-        appClient.setApiKey(randomKey);
+        String apiKeyGeneratedRandomly;
+        do {
+            apiKeyGeneratedRandomly = UUID.randomUUID().toString();
+        } while (appClientRepository.findById(apiKeyGeneratedRandomly).isPresent());
+        appClient.setApiKey(apiKeyGeneratedRandomly);
         appClientRepository.save(appClient);
-        return new ClientRegistrationResponseDTO(randomKey);
+        return new ClientRegistrationResponseDTO(apiKeyGeneratedRandomly);
     }
 
     private void throwExceptionIfFieldIsMissing(String nameOfField, String valueOfField) {
