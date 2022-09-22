@@ -19,4 +19,32 @@ public class Position {
     public Position() {
     }
 
+    // region GETTERS
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getJobLocation() {
+        return jobLocation;
+    }
+
+    // endregion
+
+    // region SETTERS
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setJobLocation(String jobLocation) {
+        this.jobLocation = jobLocation;
+    }
+
+    // endregion
+
 }
