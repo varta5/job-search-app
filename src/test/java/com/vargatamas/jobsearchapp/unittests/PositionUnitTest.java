@@ -1,5 +1,6 @@
 package com.vargatamas.jobsearchapp.unittests;
 
+import com.vargatamas.jobsearchapp.dtos.GetPositionResponseDTO;
 import com.vargatamas.jobsearchapp.dtos.PostPositionRequestDTO;
 import com.vargatamas.jobsearchapp.dtos.PostPositionResponseDTO;
 import com.vargatamas.jobsearchapp.exceptions.InvalidInputParameterException;
@@ -14,9 +15,12 @@ import org.mockito.stubbing.Answer;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -112,6 +116,38 @@ public class PositionUnitTest {
 
     // endregion
 
+    // region unit test for findPositionById method
+
+    @Test
+    public void findPositionById_IdIsNull_ThrowsInvalidInputParameterException() {
+        InvalidInputParameterException exception = assertThrowsExactly(InvalidInputParameterException.class,
+                () -> positionService.findPositionById(null));
+        assertEquals("Please provide the ID of the position after '/position/'", exception.getMessage());
+    }
+
+    @Test
+    public void findPositionById_NoExistingPositionWithId_ThrowsInvalidInputParameterException() {
+        Long inputId = 1L;
+        when(positionRepository.findById(inputId)).thenReturn(Optional.empty());
+        InvalidInputParameterException exception = assertThrowsExactly(InvalidInputParameterException.class,
+                () -> positionService.findPositionById(inputId));
+        assertEquals("No position exists in our database with the ID provided", exception.getMessage());
+    }
+
+    @Test
+    public void findPositionById_ValidRequest_ReturnsGetPositionResponseDto() {
+        Long inputId = 1L;
+        Position position = getValidPosition();
+        when(positionRepository.findById(inputId)).thenReturn(Optional.of(position));
+        GetPositionResponseDTO responseDTO = positionService.findPositionById(inputId);
+        assertTrue(responseDTO.getId().equals(position.getId())
+                && responseDTO.getName().equals(position.getName())
+                && responseDTO.getJobLocation().equals(position.getJobLocation())
+                && responseDTO.getAppClientName().equals(position.getAppClient().getName()));
+    }
+
+    // endregion
+
     private AppClient getValidAppClient() {
         AppClient appClient = new AppClient();
         appClient.setApiKey("f5736401-bcf0-4f04-b896-01777e5d0bb1");
@@ -125,6 +161,15 @@ public class PositionUnitTest {
         ReflectionTestUtils.setField(postPositionRequestDTO, "name", "Test Position Name");
         ReflectionTestUtils.setField(postPositionRequestDTO, "jobLocation", "Test Position Location");
         return postPositionRequestDTO;
+    }
+
+    private Position getValidPosition() {
+        Position position = new Position();
+        ReflectionTestUtils.setField(position, "name", "Test Position Name");
+        ReflectionTestUtils.setField(position, "jobLocation", "Test Position Location");
+        ReflectionTestUtils.setField(position, "id", 1L);
+        position.setAppClient(getValidAppClient());
+        return position;
     }
 
 }
