@@ -65,8 +65,7 @@ public class PositionIntegrationTest {
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(mediaType))
-                .andExpect(jsonPath("$.error").value(
-                        "Field 'name' should not exceed 50 characters"));
+                .andExpect(jsonPath("$.error").value("Field 'name' should not exceed 50 characters"));
     }
 
     @Test

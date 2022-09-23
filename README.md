@@ -8,7 +8,7 @@ This API enables clients to create and search job positions. Request and respons
 
 ### POST /client
 
-Querystring parameters are not used
+Register new Client on the API server
 
 Request body parameters:
 
@@ -17,7 +17,7 @@ Request body parameters:
 
 Response body parameters:
 
-- `apiKey` - string, a UUID generated randomly, this should be saved by the client for identification of upcoming requests
+- `apiKey` - string, a <abbr title="Universal Unique Identifier">UUID</abbr> generated randomly, this should be saved by the client for identification of upcoming requests
 
 Example request body:
 
@@ -30,4 +30,34 @@ Example response body:
 
     {
         "apiKey": "2696d582-0532-4796-b6f0-45a60cd55892"
+    }
+
+### POST /position
+
+Create new job / Position on the API server
+
+Header parameters:
+
+- `Authorization` - string, the API key / ID which is created at Client registration (POST /client endpoint), in <abbr title="Universal Unique Identifier">UUID</abbr> format, hexadecimal digits between 'a' and 'f' are accepted both as lowercase and as uppercase letters
+
+Request body parameters:
+
+- `name` - string, the name of the position to be saved, should not exceed 50 characters,
+- `location` - string, the geographic location of the job position to be saved, should not exceed 50 characters
+
+Response body parameters:
+
+- `positionUrl` - string, the URL under which the position will be available with GET requests
+
+Example request body:
+
+    {
+        "name": "Example Position Name",
+        "location": "London, United Kingdom"
+    }
+
+Example response body:
+
+    {
+        "apiKey": "https://github.com/varta5/job-search-app/api/v1/position/9"
     }
