@@ -89,3 +89,34 @@ Example response body:
         "location": "London, United Kingdom",
         "nameOfClientPostingTheJob": "Example Client Name"
     }
+
+### GET /position/search
+
+Search for positions using keywords `name` and `location`. Keywords do not need to fully match the value of the respective fields of job positions. If a keyword contains a substring of the actual `name` or `location` of a job position then it counts as a match
+
+If neither `name` nor `location` are specified in the querystring then this endpoint will return all saved positions. If only `name` or `location` is provided then only that criteria is taken into consideration for the list of results. If both `name` and `location` keywords are provided then only those positions will be listed where both criteria are met.
+
+The search is case-sensitive (e.g., "Software developer" will not be listed when searching for "software developer")
+
+The response body is a list of the URLs of the positions matching the search criteria.
+
+Query parameters:
+
+- `name` - string, optional, case-sensitive, should be a substring of the name of job positions needed to be listed
+- `location` - string, optional, case-sensitive, should be a substring of the location of job positions needed to be listed
+
+Header parameters:
+
+- `Authorization` - string, the API key / ID which is created at Client registration (POST /client endpoint), in <abbr title="Universal Unique Identifier">UUID</abbr> format, hexadecimal digits between 'a' and 'f' are accepted both as lowercase and as uppercase letters
+
+Response body:
+
+- List of string, each the URL of that specific position
+
+Example response body:
+
+    [
+        "https://github.com/varta5/job-search-app/api/v1/position/2",
+        "https://github.com/varta5/job-search-app/api/v1/position/9",
+        "https://github.com/varta5/job-search-app/api/v1/position/365"
+    ]
