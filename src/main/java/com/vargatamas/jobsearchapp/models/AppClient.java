@@ -21,6 +21,14 @@ public class AppClient {
     public AppClient() {
     }
 
+    // region GETTERS
+
+    public String getName() {
+        return name;
+    }
+
+    // region SETTERS
+
     // region SETTERS
 
     public void setApiKey(String apiKey) {

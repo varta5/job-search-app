@@ -2,6 +2,7 @@ package com.vargatamas.jobsearchapp.unittests;
 
 import com.vargatamas.jobsearchapp.dtos.ClientRegistrationRequestDTO;
 import com.vargatamas.jobsearchapp.dtos.ClientRegistrationResponseDTO;
+import com.vargatamas.jobsearchapp.exceptions.ClientAuthenticationException;
 import com.vargatamas.jobsearchapp.exceptions.InvalidInputParameterException;
 import com.vargatamas.jobsearchapp.models.AppClient;
 import com.vargatamas.jobsearchapp.repositories.AppClientRepository;
@@ -25,12 +26,14 @@ public class AppClientUnitTest {
     private AppClientRepository appClientRepository;
     private AppClientServiceImpl appClientService;
     private ClientRegistrationRequestDTO clientRegistrationRequestDTO;
+    private String aValidUuid;
 
     @BeforeEach
     public void setUpAppClientService() {
         appClientRepository = Mockito.mock(AppClientRepository.class);
         appClientService = new AppClientServiceImpl(appClientRepository, new ModelMapper());
         setUpValidClientRegistrationRequestDto();
+        aValidUuid = "f5736401-bcf0-4f04-b896-01777e5d0bb1";
     }
 
     // region unit tests for saveClient method
@@ -117,6 +120,49 @@ public class AppClientUnitTest {
 
     // endregion
 
+    // region unit tests for getAppClientById method
+
+    @Test
+    public void getAppClientById_ApiKeyIsNull_ThrowsInvalidInputParameterException() {
+        InvalidInputParameterException exception = assertThrowsExactly(InvalidInputParameterException.class,
+                () -> appClientService.getAppClientById(null));
+        assertEquals("Field 'apiKey' is missing or empty", exception.getMessage());
+    }
+
+    @Test
+    public void getAppClientById_ApiKeyIsEmpty_ThrowsInvalidInputParameterException() {
+        InvalidInputParameterException exception = assertThrowsExactly(InvalidInputParameterException.class,
+                () -> appClientService.getAppClientById(""));
+        assertEquals("Field 'apiKey' is missing or empty", exception.getMessage());
+    }
+
+    @Test
+    public void getAppClientById_ApiKeyContainsNonHexadecimalDigit_ThrowsInvalidInputParameterException() {
+        InvalidInputParameterException exception = assertThrowsExactly(InvalidInputParameterException.class,
+                () -> appClientService.getAppClientById("g5736401-bcf0-4f04-b896-01777e5d0bb1"));
+        assertEquals("Provided apiKey does not have the valid format of UUID. Please provide apiKey in valid format: "
+                + "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX each X representing a hexadecimal digit", exception.getMessage());
+    }
+
+    @Test
+    public void getAppClientById_ApiKeyNotSavedInDatabase_ThrowsClientAuthenticationException() {
+        when(appClientRepository.findById(aValidUuid)).thenReturn(Optional.empty());
+        ClientAuthenticationException exception = assertThrowsExactly(ClientAuthenticationException.class,
+                () -> appClientService.getAppClientById(aValidUuid));
+        assertEquals("'apiKey' is not registered in the system. Please provide already saved identifier",
+                exception.getMessage());
+    }
+
+    @Test
+    public void getAppClientById_ApiKeyExistingInDatabase_ReturnsAppClient() {
+        when(appClientRepository.findById(aValidUuid))
+                .thenReturn(Optional.of(getExistingAppClientWithApiKey(aValidUuid)));
+        AppClient appClient = appClientService.getAppClientById(aValidUuid);
+        assertEquals(appClient.getName(), "Test Name");
+    }
+
+    // endregion
+
     private void setUpValidClientRegistrationRequestDto() {
         clientRegistrationRequestDTO = new ClientRegistrationRequestDTO();
         ReflectionTestUtils.setField(clientRegistrationRequestDTO, "name", "testName");
@@ -126,6 +172,14 @@ public class AppClientUnitTest {
     private boolean validateThatStringIsUuid(String textToValidate) {
         Pattern uuidPattern = Pattern.compile("^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$");
         return uuidPattern.matcher(textToValidate).matches();
+    }
+
+    private AppClient getExistingAppClientWithApiKey(String apiKey) {
+        AppClient appClient = new AppClient();
+        appClient.setApiKey(apiKey);
+        appClient.setName("Test Name");
+        appClient.setEmailAddress("test@example.com");
+        return appClient;
     }
 
 }

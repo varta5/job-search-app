@@ -48,7 +48,7 @@ public class AppClientServiceImpl implements AppClientService {
     public AppClient getAppClientById(String apiKey) {
         throwExceptionIfFieldIsMissing("apiKey", apiKey);
         throwExceptionIfApiKeyIsNotUuidFormat(apiKey);
-        return appClientRepository.findById(apiKey).orElseThrow(() -> new ClientAuthenticationException(
+        return appClientRepository.findById(apiKey.toLowerCase()).orElseThrow(() -> new ClientAuthenticationException(
                 "'apiKey' is not registered in the system. Please provide already saved identifier"));
     }
 
