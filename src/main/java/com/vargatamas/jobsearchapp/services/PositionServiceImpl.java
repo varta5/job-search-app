@@ -1,5 +1,6 @@
 package com.vargatamas.jobsearchapp.services;
 
+import com.vargatamas.jobsearchapp.dtos.GetPositionResponseDTO;
 import com.vargatamas.jobsearchapp.dtos.PostPositionRequestDTO;
 import com.vargatamas.jobsearchapp.dtos.PostPositionResponseDTO;
 import com.vargatamas.jobsearchapp.exceptions.InvalidInputParameterException;
@@ -35,6 +36,16 @@ public class PositionServiceImpl implements PositionService {
         positionRepository.save(position);
         Dotenv dotenv = Dotenv.load();
         return new PostPositionResponseDTO(dotenv.get("API_BASE_URL") + "/position/" + position.getId());
+    }
+
+    @Override
+    public GetPositionResponseDTO findPositionById(Long id) {
+        if (id == null) {
+            throw new InvalidInputParameterException("Please provide the ID of the position after '/position/'");
+        }
+        Position position = positionRepository.findById(id).orElseThrow(
+                () -> new InvalidInputParameterException("No position exists in our database with the ID provided"));
+        return modelMapper.map(position, GetPositionResponseDTO.class);
     }
 
     private void throwExceptionIfRequestBodyDtoIsMissing(PostPositionRequestDTO postPositionRequestDTO) {
