@@ -54,6 +54,12 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     public List<String> findPositionsByNameAndLocation(String name, String location) {
+        if (name != null) {
+            throwExceptionIfValueIsLongerThanFiftyCharacters("name", name);
+        }
+        if (location != null) {
+            throwExceptionIfValueIsLongerThanFiftyCharacters("location", location);
+        }
         List<Position> positionsFound;
         if (name == null || name.isEmpty()) {
             if (location == null || location.isEmpty()) {
