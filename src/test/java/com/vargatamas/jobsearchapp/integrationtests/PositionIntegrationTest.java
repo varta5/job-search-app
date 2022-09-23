@@ -125,6 +125,65 @@ public class PositionIntegrationTest {
 
     // endregion
 
+    // region integration tests for GET /position/search endpoint
+
+    @Test
+    public void getPositionSearch_InvalidApiKeyInHeader_ReturnsUnauthorized() throws Exception {
+        mockMvc.perform(get("/position/search?name=testName&location=testLocation")
+                        .header("Authorization", "e5736401-bcf0-4f04-b896-01777e5d0bb1"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType(mediaType))
+                .andExpect(jsonPath("$.error").value(
+                        "'apiKey' is not registered in the system. Please provide already saved identifier"));
+    }
+
+    @Test
+    public void getPositionSearch_LocationIsTooLong_ReturnsBadRequest() throws Exception {
+        mockMvc.perform(get("/position/search?name=testName&location=012345678901234567890123456789012345678901234567890")
+                        .header("Authorization", "f5736401-bcf0-4f04-b896-01777e5d0bb1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(mediaType))
+                .andExpect(jsonPath("$.error").value("Field 'location' should not exceed 50 characters"));
+    }
+
+    @Test
+    public void getPositionSearch_NoQuerystringProvided_ReturnsFullList() throws Exception {
+        mockMvc.perform(get("/position/search")
+                        .header("Authorization", "f5736401-bcf0-4f04-b896-01777e5d0bb1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(mediaType))
+                .andExpect(jsonPath("$.size()").value(3));
+    }
+
+    @Test
+    public void getPositionSearch_OnlyNameProvidedAsSearchCriteria_ReturnsOneUrl() throws Exception {
+        mockMvc.perform(get("/position/search?name=name")
+                        .header("Authorization", "f5736401-bcf0-4f04-b896-01777e5d0bb1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(mediaType))
+                .andExpect(jsonPath("$.size()").value(1));
+    }
+
+    @Test
+    public void getPositionSearch_OnlyLocationProvidedAsSearchCriteria_ReturnsTwoUrls() throws Exception {
+        mockMvc.perform(get("/position/search?location=ffice")
+                        .header("Authorization", "f5736401-bcf0-4f04-b896-01777e5d0bb1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(mediaType))
+                .andExpect(jsonPath("$.size()").value(2));
+    }
+
+    @Test
+    public void getPositionSearch_NameAndLocationAreProvidedAsSearchCriteria_ReturnsEmptyList() throws Exception {
+        mockMvc.perform(get("/position/search?name=name&location=ffice")
+                        .header("Authorization", "f5736401-bcf0-4f04-b896-01777e5d0bb1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(mediaType))
+                .andExpect(jsonPath("$.size()").value(0));
+    }
+
+    // endregion
+
     private String getValidPostPositionRequestBody() throws JsonProcessingException {
         PostPositionRequestDTO requestDTO = new PostPositionRequestDTO();
         ReflectionTestUtils.setField(requestDTO, "name", "Test Position Name");

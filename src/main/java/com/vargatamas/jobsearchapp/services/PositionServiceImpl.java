@@ -12,14 +12,19 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class PositionServiceImpl implements PositionService {
 
+    private final Dotenv dotenv;
     private final ModelMapper modelMapper;
     private final PositionRepository positionRepository;
 
     @Autowired
     public PositionServiceImpl(ModelMapper modelMapper, PositionRepository positionRepository) {
+        dotenv = Dotenv.load();
         this.modelMapper = modelMapper;
         this.positionRepository = positionRepository;
     }
@@ -34,7 +39,6 @@ public class PositionServiceImpl implements PositionService {
         Position position = modelMapper.map(postPositionRequestDTO, Position.class);
         position.setAppClient(appClient);
         positionRepository.save(position);
-        Dotenv dotenv = Dotenv.load();
         return new PostPositionResponseDTO(dotenv.get("API_BASE_URL") + "/position/" + position.getId());
     }
 
@@ -46,6 +50,35 @@ public class PositionServiceImpl implements PositionService {
         Position position = positionRepository.findById(id).orElseThrow(
                 () -> new InvalidInputParameterException("No position exists in our database with the ID provided"));
         return modelMapper.map(position, GetPositionResponseDTO.class);
+    }
+
+    @Override
+    public List<String> findPositionsByNameAndLocation(String name, String location) {
+        if (name != null) {
+            throwExceptionIfValueIsLongerThanFiftyCharacters("name", name);
+        }
+        if (location != null) {
+            throwExceptionIfValueIsLongerThanFiftyCharacters("location", location);
+        }
+        List<Position> positionsFound;
+        if (name == null || name.isEmpty()) {
+            if (location == null || location.isEmpty()) {
+                positionsFound = positionRepository.findAll();
+            } else {
+                positionsFound = positionRepository.findByJobLocationContains(location);
+            }
+        } else {
+            if (location == null || location.isEmpty()) {
+                positionsFound = positionRepository.findByNameContains(name);
+            } else {
+                positionsFound = positionRepository.findByNameContainsAndJobLocationContains(name, location);
+            }
+        }
+        List<String> urlList = new ArrayList<>();
+        for (Position position : positionsFound) {
+            urlList.add(dotenv.get("API_BASE_URL") + "/position/" + position.getId());
+        }
+        return urlList;
     }
 
     private void throwExceptionIfRequestBodyDtoIsMissing(PostPositionRequestDTO postPositionRequestDTO) {

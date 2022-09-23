@@ -15,6 +15,7 @@ import org.mockito.stubbing.Answer;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -144,6 +145,59 @@ public class PositionUnitTest {
                 && responseDTO.getName().equals(position.getName())
                 && responseDTO.getJobLocation().equals(position.getJobLocation())
                 && responseDTO.getAppClientName().equals(position.getAppClient().getName()));
+    }
+
+    // endregion
+
+    // region unit test for findPositionsByNameAndLocation method
+
+    @Test
+    public void findPositionsByNameAndLocation_NameIsLongerThanFiftyCharacters_ThrowsInvalidInputParameterException() {
+        InvalidInputParameterException exception = assertThrowsExactly(InvalidInputParameterException.class,
+                () -> positionService.findPositionsByNameAndLocation(
+                        "012345678901234567890123456789012345678901234567890", "testLocation"));
+        assertEquals("Field 'name' should not exceed 50 characters", exception.getMessage());
+    }
+
+    @Test
+    public void findPositionsByNameAndLocation_LocationIsLongerThanFiftyCharacters_ThrowsInvalidInputParameterException() {
+        InvalidInputParameterException exception = assertThrowsExactly(InvalidInputParameterException.class,
+                () -> positionService.findPositionsByNameAndLocation(
+                        "testName", "012345678901234567890123456789012345678901234567890"));
+        assertEquals("Field 'location' should not exceed 50 characters", exception.getMessage());
+    }
+
+    @Test
+    public void findPositionsByNameAndLocation_NameIsEmptyAndLocationIsNull_ReturnsListOfUrl() {
+        when(positionRepository.findAll()).thenReturn(List.of(getValidPosition()));
+        List<String> urlList = positionService.findPositionsByNameAndLocation("", null);
+        assertEquals(1, urlList.size());
+    }
+
+    @Test
+    public void findPositionsByNameAndLocation_NameIsPopulatedAndLocationIsEmpty_ReturnsListOfUrl() {
+        String name = "testName";
+        when(positionRepository.findByNameContains(name)).thenReturn(List.of(getValidPosition()));
+        List<String> urlList = positionService.findPositionsByNameAndLocation(name, "");
+        assertEquals(1, urlList.size());
+    }
+
+    @Test
+    public void findPositionsByNameAndLocation_NameIsNullAndLocationIsPopulated_ReturnsListOfUrl() {
+        String location = "testLocation";
+        when(positionRepository.findByJobLocationContains(location)).thenReturn(List.of(getValidPosition()));
+        List<String> urlList = positionService.findPositionsByNameAndLocation(null, location);
+        assertEquals(1, urlList.size());
+    }
+
+    @Test
+    public void findPositionsByNameAndLocation_NameAndLocationArePopulated_ReturnsListOfUrl() {
+        String name = "testName";
+        String location = "testLocation";
+        when(positionRepository.findByNameContainsAndJobLocationContains(name, location))
+                .thenReturn(List.of(getValidPosition()));
+        List<String> urlList = positionService.findPositionsByNameAndLocation(name, location);
+        assertEquals(1, urlList.size());
     }
 
     // endregion
