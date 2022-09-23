@@ -4,6 +4,14 @@ Job search backend API using Spring Boot, Gradle and JSON
 
 This API enables clients to create and search job positions. Request and response bodies need to contain data in JSON format
 
+## Configuration
+
+The application uses H2 in-memory database
+
+The username and the password to access the H2 database (through H2 console) can be provided in a Dotenv / `.env` file in the root folder of the project (fields **DB_USERNAME** and **DB_PASSWORD**). The same folder contains a `.env.example` file to show the exact format of the `.env` file to be created
+
+The base URL of the application needs to be set in the `.env` file as the value of **API_BASE_URL** field. The `.env.example` file serves as a guideline how to structure the `.env` file
+
 ## Available endpoints
 
 ### POST /client
