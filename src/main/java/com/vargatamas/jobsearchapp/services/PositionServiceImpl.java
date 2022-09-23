@@ -6,6 +6,7 @@ import com.vargatamas.jobsearchapp.exceptions.InvalidInputParameterException;
 import com.vargatamas.jobsearchapp.models.AppClient;
 import com.vargatamas.jobsearchapp.models.Position;
 import com.vargatamas.jobsearchapp.repositories.PositionRepository;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,8 @@ public class PositionServiceImpl implements PositionService {
         Position position = modelMapper.map(postPositionRequestDTO, Position.class);
         position.setAppClient(appClient);
         positionRepository.save(position);
-        return new PostPositionResponseDTO("/position/" + position.getId());
+        Dotenv dotenv = Dotenv.load();
+        return new PostPositionResponseDTO(dotenv.get("API_BASE_URL") + "/position/" + position.getId());
     }
 
     private void throwExceptionIfRequestBodyDtoIsMissing(PostPositionRequestDTO postPositionRequestDTO) {
