@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/position")
@@ -43,6 +46,15 @@ public class PositionController {
             @PathVariable("id") Long positionId) {
         appClientService.getAppClientById(apiKey);
         return ResponseEntity.ok(positionService.findPositionById(positionId));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<String>> searchPositions(
+            @RequestHeader(name = "Authorization", required = false) String apiKey,
+            @RequestParam(name = "name", required = false) String positionName,
+            @RequestParam(name = "location", required = false) String jobLocation) {
+        appClientService.getAppClientById(apiKey);
+        return ResponseEntity.ok(positionService.findPositionsByNameAndLocation(positionName, jobLocation));
     }
 
 }
