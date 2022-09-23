@@ -54,13 +54,20 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     public List<String> findPositionsByNameAndLocation(String name, String location) {
-        if (name == null) {
-            name = "";
+        List<Position> positionsFound;
+        if (name == null || name.isEmpty()) {
+            if (location == null || location.isEmpty()) {
+                positionsFound = positionRepository.findAll();
+            } else {
+                positionsFound = positionRepository.findByJobLocationContains(location);
+            }
+        } else {
+            if (location == null || location.isEmpty()) {
+                positionsFound = positionRepository.findByNameContains(name);
+            } else {
+                positionsFound = positionRepository.findByNameContainsAndJobLocationContains(name, location);
+            }
         }
-        if (location == null) {
-            location = "";
-        }
-        List<Position> positionsFound = positionRepository.findByNameContainsOrJobLocationContains(name, location);
         List<String> urlList = new ArrayList<>();
         for (Position position : positionsFound) {
             urlList.add(dotenv.get("API_BASE_URL") + "/position/" + position.getId());

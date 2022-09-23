@@ -9,6 +9,10 @@ import java.util.List;
 @Repository
 public interface PositionRepository extends JpaRepository<Position, Long> {
 
-    List<Position> findByNameContainsOrJobLocationContains(String subStringOfName, String subStringOfJobLocation);
+    List<Position> findByNameContains(String subStringOfName);
+
+    List<Position> findByJobLocationContains(String subStringOfJobLocation);
+
+    List<Position> findByNameContainsAndJobLocationContains(String subStringOfName, String subStringOfJobLocation);
 
 }
