@@ -61,3 +61,31 @@ Example response body:
     {
         "apiKey": "https://github.com/varta5/job-search-app/api/v1/position/9"
     }
+
+### GET /position/{id}
+
+Read a specific job position from the API server
+
+Path variables:
+
+- `id` - integer, the ID of the position
+
+Header parameters:
+
+- `Authorization` - string, the API key / ID which is created at Client registration (POST /client endpoint), in <abbr title="Universal Unique Identifier">UUID</abbr> format, hexadecimal digits between 'a' and 'f' are accepted both as lowercase and as uppercase letters
+
+Response body parameters:
+
+- `id` - integer, the ID of the position
+- `nameOfPosition` - string, the name of the position
+- `location` - string, the geographical location of the position
+- `nameOfClientPostingTheJob` - string, the name of the client / company posting the job position
+
+Example response body:
+
+    {
+        "id": 2,
+        "nameOfPosition": "Example Position Name",
+        "location": "London, United Kingdom",
+        "nameOfClientPostingTheJob": "Example Client Name"
+    }

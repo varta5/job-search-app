@@ -37,6 +37,10 @@ public class Position {
         return jobLocation;
     }
 
+    public AppClient getAppClient() {
+        return appClient;
+    }
+
     // endregion
 
     // region SETTERS
