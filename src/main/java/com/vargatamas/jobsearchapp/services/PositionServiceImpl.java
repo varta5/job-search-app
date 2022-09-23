@@ -1,9 +1,9 @@
 package com.vargatamas.jobsearchapp.services;
 
-import com.vargatamas.jobsearchapp.dtos.ClientRegistrationRequestDTO;
 import com.vargatamas.jobsearchapp.dtos.PostPositionRequestDTO;
 import com.vargatamas.jobsearchapp.dtos.PostPositionResponseDTO;
 import com.vargatamas.jobsearchapp.exceptions.InvalidInputParameterException;
+import com.vargatamas.jobsearchapp.models.AppClient;
 import com.vargatamas.jobsearchapp.models.Position;
 import com.vargatamas.jobsearchapp.repositories.PositionRepository;
 import org.modelmapper.ModelMapper;
@@ -23,13 +23,14 @@ public class PositionServiceImpl implements PositionService {
     }
 
     @Override
-    public PostPositionResponseDTO savePosition(PostPositionRequestDTO postPositionRequestDTO) {
+    public PostPositionResponseDTO savePosition(PostPositionRequestDTO postPositionRequestDTO, AppClient appClient) {
         throwExceptionIfRequestBodyDtoIsMissing(postPositionRequestDTO);
         throwExceptionIfFieldIsMissing("name", postPositionRequestDTO.getName());
         throwExceptionIfValueIsLongerThanFiftyCharacters("name", postPositionRequestDTO.getName());
         throwExceptionIfFieldIsMissing("location", postPositionRequestDTO.getJobLocation());
         throwExceptionIfValueIsLongerThanFiftyCharacters("location", postPositionRequestDTO.getJobLocation());
         Position position = modelMapper.map(postPositionRequestDTO, Position.class);
+        position.setAppClient(appClient);
         positionRepository.save(position);
         return new PostPositionResponseDTO("/position/" + position.getId());
     }

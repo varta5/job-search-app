@@ -2,6 +2,7 @@ package com.vargatamas.jobsearchapp.services;
 
 import com.vargatamas.jobsearchapp.dtos.ClientRegistrationRequestDTO;
 import com.vargatamas.jobsearchapp.dtos.ClientRegistrationResponseDTO;
+import com.vargatamas.jobsearchapp.exceptions.ClientAuthenticationException;
 import com.vargatamas.jobsearchapp.exceptions.InvalidInputParameterException;
 import com.vargatamas.jobsearchapp.models.AppClient;
 import com.vargatamas.jobsearchapp.repositories.AppClientRepository;
@@ -43,6 +44,14 @@ public class AppClientServiceImpl implements AppClientService {
         return new ClientRegistrationResponseDTO(apiKeyGeneratedRandomly);
     }
 
+    @Override
+    public AppClient getAppClientById(String apiKey) {
+        throwExceptionIfFieldIsMissing("apiKey", apiKey);
+        throwExceptionIfApiKeyIsNotUuidFormat(apiKey);
+        return appClientRepository.findById(apiKey).orElseThrow(() -> new ClientAuthenticationException(
+                "'apiKey' is not registered in the system. Please provide already saved identifier"));
+    }
+
     private void throwExceptionIfRequestBodyDtoIsMissing(ClientRegistrationRequestDTO clientRegistrationRequestDTO) {
         if (clientRegistrationRequestDTO == null) {
             throw new InvalidInputParameterException(
@@ -72,6 +81,15 @@ public class AppClientServiceImpl implements AppClientService {
     private void throwExceptionIfEmailAddressAlreadySaved(String emailAddress) {
         if (appClientRepository.findByEmailAddress(emailAddress).isPresent()) {
             throw new InvalidInputParameterException("E-mail address '" + emailAddress + "' is already in use");
+        }
+    }
+
+    private void throwExceptionIfApiKeyIsNotUuidFormat(String apiKey) {
+        Pattern uuidPattern = Pattern.compile("^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$");
+        if (!uuidPattern.matcher(apiKey).matches()) {
+            throw new InvalidInputParameterException(
+                    "Provided apiKey does not have the valid format of UUID. Please provide apiKey in valid format: "
+                    + "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX each X representing a hexadecimal digit");
         }
     }
 

@@ -15,4 +15,10 @@ public class AppGlobalExceptionHandler {
         return new ErrorDTO(exception.getMessage());
     }
 
+    @ExceptionHandler(value = {ClientAuthenticationException.class})
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+    public ErrorDTO handleClientAuthenticationException(ClientAuthenticationException exception) {
+        return new ErrorDTO(exception.getMessage());
+    }
+
 }

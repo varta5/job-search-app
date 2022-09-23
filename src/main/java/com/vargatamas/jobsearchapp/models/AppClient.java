@@ -2,7 +2,9 @@ package com.vargatamas.jobsearchapp.models;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "clients")
@@ -12,6 +14,9 @@ public class AppClient {
     private String apiKey;
     private String name;
     private String emailAddress;
+
+    @OneToMany(mappedBy = "appClient")
+    private List<Position> positions;
 
     public AppClient() {
     }
