@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono&family=Noto+Sans:wght@400;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+    <title>Job search API</title>
+</head>
+<body>
+    <h1>Job search application</h1>
+    <p>Job search backend <abbr title="Application Programming Interface">API</abbr> using Spring Boot, Gradle and <abbr title="JavaScript Object Notation">JSON</abbr></p>
+    <p>This <abbr title="Application Programming Interface">API</abbr> enables clients to create and search job positions. Request and response bodies need to contain data in <abbr title="JavaScript Object Notation">JSON</abbr> format</p>
+    <hr>
+
+    <h2>Available endpoints</h2>
+
+    <h3>POST /client</h3>
+    <p>Register new Client on the <abbr title="Application Programming Interface">API</abbr> server</p>
+    <p>Request body parameters:</p>
+    <ul>
+        <li><ins>name</ins> - string, the name of the client to be saved, should not exceed 100 characters,</li>
+        <li><ins>emailAddress</ins> - string, the e-mail address of the client to be saved, should be a valid e-mail address as per RFC 5322</li>
+    </ul>
+    <p>Response body parameters:</p>
+    <ul>
+        <li><ins>apiKey</ins> - string, a <abbr title="Universal Unique Identifier">UUID</abbr> generated randomly, this should be saved by the client for identification of upcoming requests</li>
+    </ul>
+    <p>Example request body:</p>
+    <pre>
+{
+    "name": "Example Client Name",
+    "emailAddress": "example@client.com"
+}</pre>
+    <p>Example response body:</p>
+    <pre>
+{
+    "apiKey": "2696d582-0532-4796-b6f0-45a60cd55892"
+}</pre>
+
+    <h3>POST /position</h3>
+    <p>Create new job / Position on the <abbr title="Application Programming Interface">API</abbr> server</p>
+    <p>Header parameters:</p>
+    <ul>
+        <li><ins>Authorization</ins> - string, the <abbr title="Application Programming Interface">API</abbr> key / ID which is created at Client registration (POST /client endpoint), in <abbr title="Universal Unique Identifier">UUID</abbr> format, hexadecimal digits between 'a' and 'f' are accepted both as lowercase and as uppercase letters</li>
+    </ul>
+    <p>Request body parameters:</p>
+    <ul>
+        <li><ins>name</ins> - string, the name of the position to be saved, should not exceed 50 characters,</li>
+        <li><ins>location</ins> - string, the geographic location of the job position to be saved, should not exceed 50 characters</li>
+    </ul>
+    <p>Response body parameters:</p>
+    <ul>
+        <li><ins>positionUrl</ins> - string, the <abbr title="Uniform Resource Locator">URL</abbr> under which the position will be available with GET requests</li>
+    </ul>
+    <p>Example request body:</p>
+    <pre>
+{
+    "name": "Example Position Name",
+    "location": "London, United Kingdom"
+}</pre>
+    <p>Example response body:</p>
+    <pre>
+{
+    "apiKey": "https://github.com/varta5/job-search-app/api/v1/position/9"
+}</pre>
+
+    <h3>GET /position/{id}</h3>
+    <p>Read a specific job position from the <abbr title="Application Programming Interface">API</abbr> server</p>
+    <p>Path variables:</p>
+    <ul>
+        <li><ins>id</ins> - integer, the ID of the position</li>
+    </ul>
+    <p>Header parameters:</p>
+    <ul>
+        <li><ins>Authorization</ins> - string, the <abbr title="Application Programming Interface">API</abbr> key / ID which is created at Client registration (POST /client endpoint), in <abbr title="Universal Unique Identifier">UUID</abbr> format, hexadecimal digits between 'a' and 'f' are accepted both as lowercase and as uppercase letters</li>
+    </ul>
+    <p>Response body parameters:</p>
+    <ul>
+        <li><ins>id</ins> - integer, the ID of the position</li>
+        <li><ins>nameOfPosition</ins> - string, the name of the position</li>
+        <li><ins>location</ins> - string, the geographical location of the position</li>
+        <li><ins>nameOfClientPostingTheJob</ins> - string, the name of the client / company posting the job position</li>
+    </ul>
+    <p>Example response body:</p>
+    <pre>
+{
+    "id": 2,
+    "nameOfPosition": "Example Position Name",
+    "location": "London, United Kingdom",
+    "nameOfClientPostingTheJob": "Example Client Name"
+}</pre>
+
+    <h3>GET /position/search</h3>
+    <p>Search for positions using keywords <ins>name</ins> and <ins>location</ins>. Keywords do not need to fully match the value of the respective fields of job positions. If a keyword contains a substring of the actual <ins>name</ins> or <ins>location</ins> of a job position then it counts as a match</p>
+    <p>If neither <ins>name</ins> nor <ins>location</ins> are specified in the querystring then this endpoint will return all saved positions. If only <ins>name</ins> or <ins>location</ins> is provided then only that criteria is taken into consideration for the list of results. If both <ins>name</ins> and <ins>location</ins> keywords are provided then only those positions will be listed where both criteria are met.</p>
+    <p>The search is case-sensitive (e.g., <em>"Software developer"</em> will not be listed when searching for <em>"software developer"</em>)</p>
+    <p>The response body is a list of the <abbr title="Uniform Resource Locator">URLs</abbr> of the positions matching the search criteria.</p>
+    <p>Query parameters:</p>
+    <ul>
+        <li><ins>name</ins> - string, optional, case-sensitive, should be a substring of the name of job positions needed to be listed</li>
+        <li><ins>location</ins> - string, optional, case-sensitive, should be a substring of the location of job positions needed to be listed</li>
+    </ul>
+    <p>Header parameters:</p>
+    <ul>
+        <li><ins>Authorization</ins> - string, the <abbr title="Application Programming Interface">API</abbr> key / ID which is created at Client registration (POST /client endpoint), in <abbr title="Universal Unique Identifier">UUID</abbr> format, hexadecimal digits between 'a' and 'f' are accepted both as lowercase and as uppercase letters</li>
+    </ul>
+    <p>Response body:</p>
+    <ul>
+        <li>List of string, each the <abbr title="Uniform Resource Locator">URL</abbr> of that specific position</li>
+    </ul>
+    <p>Example response body:</p>
+    <pre>
+[
+    "https://github.com/varta5/job-search-app/api/v1/position/2",
+    "https://github.com/varta5/job-search-app/api/v1/position/9",
+    "https://github.com/varta5/job-search-app/api/v1/position/365"
+]</pre>
+</body>
+</html>

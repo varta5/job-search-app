@@ -1,0 +1,31 @@
+body {
+    background-color: #efe;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 16px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 36px;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+h3 {
+    font-size: 20px;
+    text-decoration: underline;
+}
+
+ins {
+    padding: 1px 5px;
+    background-color: #cee;
+    text-decoration: none;
+}
+
+pre {
+    padding: 2px 8px;
+    background-color: #cee;
+    font-family: 'Noto Sans Mono', monospace;
+}
