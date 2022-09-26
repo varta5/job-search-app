@@ -15,4 +15,6 @@ public interface PositionService {
 
     List<String> findPositionsByNameAndLocation(String name, String location);
 
+    void loadInitialPositions(AppClient firstAppClient, AppClient secondAppClient);
+
 }

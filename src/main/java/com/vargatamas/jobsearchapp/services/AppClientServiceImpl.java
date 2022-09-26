@@ -52,6 +52,25 @@ public class AppClientServiceImpl implements AppClientService {
                 "'apiKey' is not registered in the system. Please provide already saved identifier"));
     }
 
+    @Override
+    public void loadInitialClients() {
+        AppClient firstAppClient = new AppClient();
+        firstAppClient.setApiKey("49b14be4-e927-4f60-9a83-59b940a2cb2e");
+        firstAppClient.setName("First Client");
+        firstAppClient.setEmailAddress("info@firstclient.com");
+        appClientRepository.save(firstAppClient);
+        AppClient secondAppClient = new AppClient();
+        secondAppClient.setApiKey("c3150bcd-9d10-4f16-80f8-aa0fb21a6f14");
+        secondAppClient.setName("Second Client");
+        secondAppClient.setEmailAddress("hello@secondclient.com");
+        appClientRepository.save(secondAppClient);
+        AppClient thirdAppClient = new AppClient();
+        thirdAppClient.setApiKey("0966e3d2-e462-4796-bd1f-8dff3b77166a");
+        thirdAppClient.setName("Third Client");
+        thirdAppClient.setEmailAddress("general@third.io");
+        appClientRepository.save(thirdAppClient);
+    }
+
     private void throwExceptionIfRequestBodyDtoIsMissing(ClientRegistrationRequestDTO clientRegistrationRequestDTO) {
         if (clientRegistrationRequestDTO == null) {
             throw new InvalidInputParameterException(
