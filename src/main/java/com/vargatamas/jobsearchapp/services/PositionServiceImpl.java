@@ -81,6 +81,25 @@ public class PositionServiceImpl implements PositionService {
         return urlList;
     }
 
+    @Override
+    public void loadInitialPositions(AppClient firstAppClient, AppClient secondAppClient) {
+        Position firstPosition = new Position();
+        firstPosition.setName("Junior backend developer");
+        firstPosition.setJobLocation("Budapest, Hungary");
+        firstPosition.setAppClient(firstAppClient);
+        positionRepository.save(firstPosition);
+        Position secondPosition = new Position();
+        secondPosition.setName("Medior Java programmer");
+        secondPosition.setJobLocation("London, UK");
+        secondPosition.setAppClient(secondAppClient);
+        positionRepository.save(secondPosition);
+        Position thirdPosition = new Position();
+        thirdPosition.setName("Senior full-stack software engineer");
+        thirdPosition.setJobLocation("Remote or hybrid, Europe");
+        thirdPosition.setAppClient(secondAppClient);
+        positionRepository.save(thirdPosition);
+    }
+
     private void throwExceptionIfRequestBodyDtoIsMissing(PostPositionRequestDTO postPositionRequestDTO) {
         if (postPositionRequestDTO == null) {
             throw new InvalidInputParameterException(

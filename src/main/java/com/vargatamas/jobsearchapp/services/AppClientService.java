@@ -10,4 +10,6 @@ public interface AppClientService {
 
     AppClient getAppClientById(String apiKey);
 
+    void loadInitialClients();
+
 }
